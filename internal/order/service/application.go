@@ -17,17 +17,21 @@ import (
 )
 
 func NewApplication(ctx context.Context) (app.Application, func()) {
+	// 初始化stockGRPC
 	stockClient, closeStockClient, err := grpcClient.NewStockGRPCClient(ctx)
 	if err != nil {
 		panic(err)
 	}
+	stockGRPC := grpc.NewStockGRPC(stockClient)
+
+	// 初始化rabbitmq
 	ch, closeCh := broker.Connect(
 		viper.GetString("rabbitmq.user"),
 		viper.GetString("rabbitmq.password"),
 		viper.GetString("rabbitmq.host"),
 		viper.GetString("rabbitmq.port"),
 	)
-	stockGRPC := grpc.NewStockGRPC(stockClient)
+	
 	return newApplication(ctx, stockGRPC, ch), func() {
 		_ = closeStockClient()
 		_ = closeCh()

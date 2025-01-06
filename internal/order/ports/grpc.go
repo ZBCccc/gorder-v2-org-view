@@ -23,6 +23,7 @@ func NewGRPCServer(app app.Application) *GRPCServer {
 	return &GRPCServer{app: app}
 }
 
+// CreateOrder 创建订单
 func (G GRPCServer) CreateOrder(ctx context.Context, request *orderpb.CreateOrderRequest) (*emptypb.Empty, error) {
 	_, err := G.app.Commands.CreateOrder.Handle(ctx, command.CreateOrder{
 		CustomerID: request.CustomerID,
@@ -45,6 +46,7 @@ func (G GRPCServer) GetOrder(ctx context.Context, request *orderpb.GetOrderReque
 	return o.ToProto(), nil
 }
 
+// UpdateOrder 更新订单
 func (G GRPCServer) UpdateOrder(ctx context.Context, request *orderpb.Order) (_ *emptypb.Empty, err error) {
 	logrus.Infof("order_grpc||request_in||request=%+v", request)
 	order, err := domain.NewOrder(request.ID, request.CustomerID, request.Status, request.PaymentLink, request.Items)
